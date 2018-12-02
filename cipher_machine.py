@@ -96,11 +96,13 @@ def generate_hill_key(keyLen,keySapce=256):
 def hill_encrypto_block(contentBlock,keyMetrix):
     outMetrix = []
     content=np.array(contentBlock)
-    key=np.array(key)
-    outMetrix=np.ndarray.tolist(contentBlock*keyMetrix)
+    key=np.array(keyMetrix)
+    outMetrix=np.ndarray.tolist(content*key)
     return outMetrix
 
-# def hill_
+# 希尔密码加密
+def hill_crypto(contentBlockArray,keyMetrixArray,method=1):
+    for
 # 希尔密码解密
 # def hill_decrypto(content,key):
 
