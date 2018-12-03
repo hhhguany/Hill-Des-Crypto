@@ -11,7 +11,7 @@
 !.vscode/extensions.json
 
 # CodeRunnerFile
-tempCodeRunnerFile.py
+!tempCodeRunnerFile.py
 
 # User-specific files
 *.suo
