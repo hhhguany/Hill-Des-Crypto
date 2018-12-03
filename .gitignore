@@ -12,6 +12,7 @@
 
 # CodeRunnerFile
 !tempCodeRunnerFile.py
+!output.txt
 
 # User-specific files
 *.suo
