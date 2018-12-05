@@ -1,11 +1,16 @@
 import util
 import numpy as np
 
+# __all__ = ["Hill", "Des"]
+
 
 class Hill:
-    def __init__(self,content=[[]],key=[[]]):
-        __key = key     ## BlockArray
-        __content=content       ## BlockArray
+    __key = [[]]
+    __content = [[]]
+
+    def __init__(self, content=[[]], key=[[]]):
+        self.__content = content  ## BlockArray
+        self.__key = key  ## BlockArray
 
     def set_key(self, key):
         self.__key = key
@@ -14,7 +19,7 @@ class Hill:
         self.__key = [[]]
 
     def put_key(self, isPrint=False):
-        if self.__key != None:
+        if self.__key != [[]]:
             if isPrint:
                 print("希尔密码密钥：")
                 for line in self.__key:
@@ -23,16 +28,16 @@ class Hill:
         else:
             print("Warning: 对象没有密钥")
 
-    def set_content(self,content):
+    def set_content(self, content):
         pass
-    
-    def reset_content(self):
-        self.__content=[[]]
 
-    def put_content(self,isPrint=False):
+    def reset_content(self):
+        self.__content = [[]]
+
+    def put_content(self, isPrint=False):
         self.put_key(isPrint)
 
-    def generate_hill_key_block(self, keyLen, keySapce=256,method=""):
+    def generate_hill_key_block(self, keyLen, keySapce=256, method=""):
         if np.sqrt(keyLen) != int(np.sqrt(keyLen)):
             keyLen = (int(np.sqrt(keyLen) + 1)) * (int(np.sqrt(keyLen) + 1))
             print("希尔密码密钥长度重置为" + str(keyLen))
@@ -47,46 +52,53 @@ class Hill:
                 keyLine = []
             if np.linalg.det(np.array(keyBlock)) != 0:
                 break
-            keyBlock = []   # 非可逆矩阵，清除
-        if method=="return":
+            keyBlock = []  # 非可逆矩阵，清除
+        if method == "return":
             return keyBlock
         self.__key = keyBlock
 
-    def generate_hill_key_block_array(self, keyLen, blockNum, keySapce=256,method=""):
-        keyBlockArray=[]
+    def generate_hill_key_block_array(self, keyLen, blockNum, keySapce=256, method=""):
+        keyBlockArray = []
         for num in range(blockNum):
-            keyBlockArray.append(self.generate_hill_key_block(keyLen,method="return"))
-        if method=="return":
+            keyBlockArray.append(self.generate_hill_key_block(keyLen, method="return"))
+        if method == "return":
             return keyBlockArray
-        self.__key=keyBlockArray
-    def encrypt(self,field,multiKeyEncryption=False,**arg):
-        cipherBlockArray=Hill.encrypt_block_array(self.__content,self.__key,field)
+        self.__key = keyBlockArray
+
+    def encrypt(self, field, **arg):
+        cipherBlockArray = Hill.encrypt_block_array(self.__content, self.__key, 256)
         return cipherBlockArray
 
+    def decrypt(self, fied, **arg):
+        plainBlockArray = Hill.decrypt_block_array(self.__content, self.__key, 256)
+        return plainBlockArray
 
-    def encrypt_block_array(contentBlockArray,keyBlock,field,multiKeyEncryption=False,**arg):
+    @staticmethod
+    def encrypt_block_array(contentBlockArray, keyBlockArray, field, multiKeyEncryption=False, **arg):
         cipherBlockArray = []
-        keyBlockNum=0
+        keyBlockNum = 0
         if multiKeyEncryption:
             for contentBlock in contentBlockArray:
-                outMetrix = Hill.encrypt_block(contentBlock, keyBlock[keyBlockNum%len(keyBlockArray)],field)
-                keyBlock+=1
-            cipherBlockArray.append(outMetrix)
+                outMetrix = Hill.encrypt_block(contentBlock, keyBlockArray[keyBlockNum % len(keyBlockArray)], field)
+                cipherBlockArray.append(outMetrix)
+                keyBlockNum += 1
         else:
             for contentBlock in contentBlockArray:
-                outMetrix = Hill.encrypt_block(contentBlock, keyBlock,field)
-            cipherBlockArray.append(outMetrix)
+                outMetrix = Hill.encrypt_block(contentBlock, keyBlockArray[0], field)
+                cipherBlockArray.append(outMetrix)
         return cipherBlockArray
 
-    def decrypt_block_array(contentBlockArray,keyBlock,field):
-        plainBlockArray=[]
+    @staticmethod
+    def decrypt_block_array(contentBlockArray, keyBlock, field):
+        plainBlockArray = []
         for contentBlock in contentBlockArray:
-            outMetrix = Hill.decrypt_block(contentBlock, keyBlock,field)
+            outMetrix = Hill.decrypt_block(contentBlock, keyBlock, field)
         plainBlockArray.append(outMetrix)
         return plainBlockArray
 
     # 希尔密码 Block 处理
-    def encrypt_block(contentBlock,keyBlock,field):
+    @staticmethod
+    def encrypt_block(contentBlock, keyBlock, field):
         cipherBlock = []
         contentArray = np.array(contentBlock)
         keyArray = np.array(keyBlock)
@@ -94,13 +106,15 @@ class Hill:
         cipherBlock = np.ndarray.tolist(np.array(cipherBlock) % (field))
         return cipherBlock
 
-    def decrypt_block(contentBlock,keyBlock,field):
-        plainBlock=[]
+    @staticmethod
+    def decrypt_block(contentBlock, keyBlock, field):
+        plainBlock = []
         contentArray = np.array(contentBlock)
         keyArray = np.array(keyBlock)
         plainBlock = np.ndarray.tolist(contentArray * np.linalg.inv(keyArray))
-        plainBlock = np.ndarray.tolist(np.array(cipherBlock) % (field))
+        plainBlock = np.ndarray.tolist(np.array(plainBlock) % (field))
         return plainBlock
+
 
 class Des:
 

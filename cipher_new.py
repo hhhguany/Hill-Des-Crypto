@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-import sys, optparse, util
-from cipher import des
+import sys, optparse, util, cipher
 import numpy as np
 
 ## usage:
@@ -9,6 +8,7 @@ import numpy as np
 
 def main():
     options = get_args()
+    function_encrypt("HILL",inDist=options.inFile,outDist=options.outFile)
     ## test
     # options.function="decrypto"
     # options.inFile="output.txt"
@@ -18,7 +18,8 @@ def main():
     # function = get_function(options)
     # cipherText = encrypto(options)
     # print_content(cipherText)
-    encrypto(options)
+
+    # encrypto(options)
 
     input()
 
@@ -33,27 +34,6 @@ def get_args():
     parser.add_option("-f", "--function", dest="function", default="encrypto", type="string", help="功能：[encrypto|decrypto]")
     (options, args) = parser.parse_args()
     return options
-
-
-def encrypto(options):
-    decodeContent = decode_file(options.inFile, options.decode)
-    decodePaddingContent = padding_content(decodeContent, "ENCODE", "ASCII", 64)
-    contentBlockArray = matrix_converter(decodePaddingContent, "ENMATRIX")
-    cipherBlockArray = cipher_core(contentBlockArray, generate_hill_key(64), options.function, options.algorithm, mod=128)
-    cipherPaddingContent = matrix_converter(cipherBlockArray, "DEMATRIX")
-    cipherText = padding_content(cipherPaddingContent, "DECODE", "ASCII", 64)
-    encode_to_file(cipherText, options.outFile, "UTF8")
-    #return cipherText
-
-
-def decrypto(co, options):
-    decodeContent = decode_file(options.inFile, options.decode)
-    decodePaddingContent = padding_content(decodeContent, "ENCODE", "ASCII", 64)
-    contentBlockArray = matrix_converter(decodePaddingContent, "ENMATRIX")
-    plainBlockArray = cipher_core(contentBlockArray, generate_hill_key(64), options.function, options.algorithm, mod=128)
-    plainPaddingContent = matrix_converter(plainBlockArray, "DEMATRIX")
-    plainText = padding_content(plainPaddingContent, "DECODE", "ASCII", 64)
-    return plainText
 
 
 def get_algorithm(options):
@@ -72,6 +52,39 @@ def get_function(options):
         sys.exit("不受支持的功能,支持的功能" + support_functions)
 
 
+def function_encrypt(algorithm, **arg):
+    if algorithm == "HILL":
+        contentFile=util.ContentFile(arg["inDist"])
+        fileContent=contentFile.get_content()
+        content=util.Content(fileContent)
+        content.content_add_padding(64)
+        contentBlockArray=content.content_to_block_array()
+
+
+        hill = cipher.Hill(contentBlockArray)
+        if arg["key"]==None:
+            hillKey=hill.generate_hill_key_block(64,method="return")
+            
+            hill.set_key(hillKey)
+        else:
+            hill.generate_hill_key_block(64)
+
+        cipherBlockArray=hill.encrypt(256)
+
+        cipherContent=util.BlockArray(cipherBlockArray)
+        content=util.Content(cipherContent.block_array_to_content())
+        content.content_drop_padding()
+        outFile=util.ContentFile(arg["outDist"])
+        outFile.write_ord(content.content)
+
+def function_decrypt(algorithm,**arg):
+    if algorithm == "HILL":
+        contentFile=util.ContentFile(arg["inDist"])
+        fileContent=contentFile.get_content()
+        content=util.Content(fileContent)
+        content.content_add_padding(64)
+        contentBlockArray=content.content_to_block_array()
+
 # 解码文件
 # 待办：支持更多解码
 # def decode_file(inFile, decode):
@@ -87,7 +100,6 @@ def get_function(options):
 #     else:
 #         pass
 #     return decodeContent
-
 
 # def encode_to_file(content, outFile, encode, clear=True):
 #     file = open(outFile, "w", encoding=encode)
@@ -129,7 +141,6 @@ def print_content(content):
 #         print("bUg1")
 #     return content
 
-
 # def matrix_converter(content, function, block_height=8, block_length=8):
 #     if function == "ENMATRIX":
 #         contentBlockArray = []
@@ -153,7 +164,6 @@ def print_content(content):
 #     else:
 #         # 增加对功能的输入判断
 #         print("bUg2")
-
 
 # def generate_hill_key(keyLen, keySapce=256):
 #     if np.sqrt(keyLen) != int(np.sqrt(keyLen)):
