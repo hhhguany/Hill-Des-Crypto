@@ -1,9 +1,11 @@
 # -*- coding: UTF-8 -*-
-import sys, argprase, util, cipher
+import sys, argparse, util, cipher
 import numpy as np
 
+VSRSION="Debug 1.22"
 ## usage:
 ## python cipher_new.py [function] [argument]
+
 
 def main():
     options = get_args()
@@ -13,17 +15,16 @@ def main():
 
 
 def get_args():
-    parser = argprase.ArgumentParser(description='一个加解密小程序')
-    parser.add_argument("")
-    parser.add_argument("-v","--version",action="store_true",help="输出版本信息")
-    parser.add_option("-i", "--infile", dest="inFile", default="message.txt", type="string", help="明文路径，默认为当前目录下 message.txt 文件")
-    parser.add_option("-o", "--outfile", dest="outFile", default="output.txt", type="string", help="输出明文路径，默认输出到当前目录下 output.txt 文件")
-    parser.add_option("-d", "--decode", dest="decode", default="ASCII", type="string", help="解码方式：[ASCII|UTF8]")
-    parser.add_option("-e", "--encode", dest="encode", default="ASCII", type="string", help="编码方式：[ASCII|UTF8]")
-    parser.add_option("-a", "--algorithm", dest="algorithm", default="HILL", type="string", help="加密算法：[HILL|DES]")
-    parser.add_option("-f", "--function", dest="function", default="encrypto", type="string", help="功能：[encrypto|decrypto]")
-    parser.add_option("-ghk","--generatehillkey",dest="generateHillKey",default=False)
-    (options, args) = parser.parse_args()
+    parser = argparse.ArgumentParser(description="一个加解密小程序")
+    parser.add_argument("-i", "--infile", dest="inFile", default="message.txt", help="明文路径，默认为当前目录下 message.txt 文件")
+    parser.add_argument("-o", "--outfile", dest="outFile", default="output.txt", help="输出明文路径，默认输出到当前目录下 output.txt 文件")
+    parser.add_argument("-d", "--decode", dest="decode", default="ASCII", help="解码方式：[ASCII|UTF8]")
+    parser.add_argument("-e", "--encode", dest="encode", default="ASCII", help="编码方式：[ASCII|UTF8]")
+    parser.add_argument("-a", "--algorithm", dest="algorithm", default="HILL",  help="加密算法：[HILL|DES]")
+    parser.add_argument("-f", "--function", dest="function", choices=["encrypto" ,"decrypto"],help="功能：[encrypto|decrypto]")
+    parser.add_argument("--generate_hill_key", action="store_true", help="生成希尔密钥：密钥长度（需要组成方阵）")
+    parser.add_argument("-v", "--version", help="VERSION %(VERSION)s, BY HE.RO")
+    options = parser.parse_args()
     return options
 
 
@@ -52,12 +53,13 @@ def function_encrypt(algorithm, **arg):
         contentBlockArray = content.content_to_block_array()
 
         hill = cipher.Hill(contentBlockArray)
-        if arg["key"] == None:
+        if "key" not in arg:
             hillKey = hill.generate_hill_key_block(64, method="return")
+            util.ContentFile.write_key_block_to_file("key.txt", hillKey)
             hill.set_key(hillKey)
         else:
             hill.generate_hill_key_block(64)
-            
+
         cipherBlockArray = hill.encrypt(256)
 
         cipherContent = util.BlockArray(cipherBlockArray)
@@ -66,16 +68,18 @@ def function_encrypt(algorithm, **arg):
         outFile = util.ContentFile(arg["outDist"])
         outFile.write_ord(content.content)
 
-def function_get_hill_key()：
-        
 
-def function_decrypt(algorithm, **arg):
-    if algorithm == "HILL":
-        contentFile = util.ContentFile(arg["inDist"])
-        fileContent = contentFile.get_content()
-        content = util.Content(fileContent)
-        content.content_add_padding(64)
-        contentBlockArray = content.content_to_block_array()
+def function_get_hill_key():
+    pass
+
+
+# def function_decrypt(algorithm, **arg):
+#     if algorithm == "HILL":
+#         contentFile = util.ContentFile(arg["inDist"])
+#         fileContent = contentFile.get_content()
+#         content = util.Content(fileContent)
+#         content.content_add_padding(64)
+#         contentBlockArray = content.content_to_block_array()
 
 
 def print_content(content):

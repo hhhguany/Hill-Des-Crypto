@@ -11,8 +11,7 @@
 !.vscode/extensions.json
 
 # CodeRunnerFile
-!tempCodeRunnerFile.py
-!output.txt
+tempCodeRunnerFile.py
 
 # User-specific files
 *.suo
@@ -339,3 +338,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+output.txt
+key.txt
