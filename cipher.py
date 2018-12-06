@@ -57,6 +57,25 @@ class Hill:
             return keyBlock
         self.__key = keyBlock
 
+    @staticmethod
+    # formatLen 控制标准化输打印输出
+    def format_key_block(keyBlock, formatLen=3):
+        keyStringArray = []
+        for keyLen in keyBlock:
+            keyString = ""
+            for item in keyLen:
+                for i in range((formatLen + 1) - len(str(item)) % (formatLen + 1)):
+                    keyString += " "
+                keyString += str(item)
+                keyString += " "
+            keyStringArray.append(keyString)
+        return keyStringArray
+
+    @staticmethod
+    def print_key_string_array(keyStringArray):
+        for keyString in keyStringArray:
+            print(keyString)
+
     def generate_hill_key_block_array(self, keyLen, blockNum, keySapce=256, method=""):
         keyBlockArray = []
         for num in range(blockNum):
@@ -189,7 +208,151 @@ class Des:
     def print(self):
         print("name is:"+self.name)
 
-# if __name__ == "__main__":
-#     a=Hill()
-#     a.generate_hill_key(64)
-#     a.put_key(True)
+class FiniteField:
+    __field=0
+    __content=[]
+
+    def __init__(self):
+        '''
+        扩展有限域函数
+        '''
+
+    def reset_field(self):
+        self.__field=0
+
+    def set_content(self,content):
+        self.__content=content
+
+    def format_list(self,numberList):
+        out=[]
+        if isinstance(numberList,int):
+            out=numberList%self.__field
+        else:
+            for i in numberList:
+                out.append(i%self.__field)
+        return out
+
+    def format_list_list(self,numberListList):
+        outContent=[]
+        if isinstance(numberListList,int):
+            outContent=self.format_list(numberListList)
+        else:
+            for i in range(len(numberListList)):
+                if isinstance(numberListList[1],int):
+                    outContent.append(self.format_list(numberListList[i]))
+                else:
+                    outContent.append(self.format_list_list(numberListList[i]))
+        return outContent
+
+    def format_content(self):
+        self.__content=self.format_list_list(self.__content)
+
+    def get_content(self):
+        return self.__content
+
+    def reset_content(self):
+        self.__content=[]
+
+    def field(self,**arg):
+        try:
+            if "field" in arg:
+                self.__field=arg["field"]
+            elif "GF2" in arg:
+                self.__field=2^arg["field"]
+            else:
+                raise Exception("Argument Error")
+        except (ValueError,TypeError) as e:
+            print(e)
+    @staticmethod
+    def is_squre_field_matrix(matrix):
+        try:
+            content=np.array(matrix)
+            np.linalg.det(content)              # 只有方阵才能计算行列式
+        except Exception:
+            return False
+        return True
+
+    def inverse_matrix_in_field(self):
+        if self.is_squre_field_matrix(self.__content):
+            content=np.array(self.__content)    # 转换成矩阵
+            martixSize=content.shape[0]
+            eye=np.eye(martixSize)
+            content=np.concatenate((content,eye),axis=1)   # 连接矩阵
+
+            # 矩阵求逆变换
+            '''
+            左下变换
+            [[213,3213,23],
+            [231,321,21],
+            [23,42,21]]
+
+            [[213. 141.  23.   1.   0.   0.]
+            [  0. 158. 232. 179.  71.   0.]
+            [  0.   0. 216.  41.  79. 118.]]
+            '''
+            if content[0][0]==0:
+                content=self.switch_matrix_row(content,0,martixSize)
+            for i in range(1,len(content)):
+                if content[i][i]==0:
+                    content=self.switch_matrix_row(content,i,martixSize)
+                for j in range(martixSize-i):
+                    lcm=self.lcm(content[i][j],content[j][j])
+                    content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
+                    content[i]=content[i]%self.__field
+
+            '''
+            右上变换
+            '''
+            if content[martixSize-1][martixSize-1]==0:
+                content=self.switch_matrix_row(content,0,martixSize,-1)
+            for i in range(martixSize-2,-1,-1):
+                if content[i][i]==0:
+                    content=self.switch_matrix_row(content,i,martixSize,-1)
+                for j in range(martixSize-1,i,-1):
+                    lcm=self.lcm(content[i][j],content[j][j])
+                    content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
+                    content[i]=content[i]%self.__field
+
+
+            print(content)
+        else:
+            raise TypeError
+
+    @staticmethod
+    def switch_matrix_row(metrix,row,martixSize,stepLen=1):
+        i=row
+        while True:
+            row+=stepLen
+            if metrix[(row)%martixSize][i] !=0:
+                break
+        tmp=metrix[row]
+        metrix[row]=metrix[(row)%martixSize]
+        # metrix[(row+1)%martixSize]=tmp
+        metrix[row]=tmp           # 理论上不应该存在最后一行盒第一行调换
+        return metrix
+
+    @staticmethod
+    def gcd(m,n):
+        if m>n:
+            tmp=m
+            m=n
+            n=tmp
+        if n%m==0:
+            return m
+        else:
+            return FiniteField.gcd(n, n%m)
+
+    @staticmethod
+    def lcm(m, n):
+        if m*n == 0:
+            return 0
+        return int(m*n/FiniteField.gcd(m, n))
+
+if __name__ == "__main__":
+    a=[[213,3213,23],[231,321,21],[23,42,21]]
+    b=FiniteField()
+    b.field(field=256)
+    b.set_content(a)
+    b.format_content()
+    b.inverse_matrix_in_field()
+    print(b.get_content())

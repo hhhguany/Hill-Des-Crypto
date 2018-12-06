@@ -56,6 +56,17 @@ class Content:
             if self.content[i] == paddingNum:
                 del self.content[i]
 
+    @staticmethod
+    def string_to_line_content(string):
+        lineContent=[]
+        line=""
+        for i in range(len(string)):
+            if string[i]=="\n":
+                lineContent.append(line)
+                line=""
+            else:
+                line+=string[i]
+        return lineContent
 
 class ContentFile:
     __fileDist = ""
@@ -107,12 +118,12 @@ class ContentFile:
             return open(fileDist, mode)
 
     @staticmethod
-    def write_key_block_to_file(fileDist, keyBlock, clear=True):
+    def write_block_to_file(fileDist, block, clear=True):
         if clear:
             ContentFile.clear_file_content(fileDist)
-        file = ContentFile.open_file(fileDist, "w")
+        file = ContentFile.open_file(fileDist, "a")
         writeContent = []
-        for keyLine in keyBlock:
+        for keyLine in block:
             for i in range(len(keyLine)):
                 writeContent.append(str(keyLine[i]))
                 writeContent.append(" ")
@@ -123,16 +134,29 @@ class ContentFile:
         file.close()
 
     @staticmethod
-    def write_key_block_array_to_file(fileDist, keyBlockArray):
-        for keyBlock in keyBlockArray:
-            ContentFile.write_key_block_to_file(fileDist, keyBlock, clear=False)
+    def write_block_array_to_file(fileDist, blockArray):
+        ContentFile.clear_file_content(fileDist)
+        for block in blockArray:
+            ContentFile.write_block_to_file(fileDist, block, clear=False)
 
+    @staticmethod
+    def read_file_key(fileDist,encode=""):
+        file = ContentFile.open_file(fileDist,"r")
+        content=file.read()
+        file.close()
+        content=Content.string_to_line_content(content)
+        keyStringBlock=[]
+        keyLine=[]
+        for line in content:
+            if line!="":
+                line=line.split(" ")
+                for i in range(len(line)):
+                    if line[i]!="":
+                        keyLine.append(int(line[i]))
+                keyStringBlock.append(keyLine)
+                keyLine=[]
+        # keyBlock=Content(keyStringBlock).content_to_block_array()
+        return keyStringBlock
+        
 
-if __name__ == "__main__":
-    a = [[1, 2, 3, 4], [2, 5, 6, 5], [
-        2,
-        43,
-        64,
-        5,
-    ], [4, 32, 1, 2]]
-    ContentFile.write_key_block_to_file("key.txt", a)
+    
