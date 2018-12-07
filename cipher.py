@@ -290,22 +290,18 @@ class FiniteField:
             [  0. 158. 232. 179.  71.   0.]
             [  0.   0. 216.  41.  79. 118.]]
             '''
-            if content[0][0]==0:
-                content=self.switch_matrix_row(content,0,martixSize)
-            for i in range(1,len(content)):
+            for i in range(len(content)):
                 if content[i][i]==0:
                     content=self.switch_matrix_row(content,i,martixSize)
-                for j in range(martixSize-i):
+                for j in range(i):
                     lcm=self.lcm(content[i][j],content[j][j])
                     content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
                     content[i]=content[i]%self.__field
-
+            # self.__gauss_jordan_elimination_left_side(content)
             '''
             右上变换
             '''
-            if content[martixSize-1][martixSize-1]==0:
-                content=self.switch_matrix_row(content,0,martixSize,-1)
-            for i in range(martixSize-2,-1,-1):
+            for i in range(martixSize-1,-1,-1):
                 if content[i][i]==0:
                     content=self.switch_matrix_row(content,i,martixSize,-1)
                 for j in range(martixSize-1,i,-1):
@@ -317,6 +313,17 @@ class FiniteField:
             print(content)
         else:
             raise TypeError
+
+    
+    def __gauss_jordan_elimination_left_side(self,content):
+        martixSize=content.shape[0]
+        for i in range(len(content)):
+            if content[i][i]==0:
+                content=self.switch_matrix_row(content,i,martixSize)
+            for j in range(i):
+                lcm=self.lcm(content[i][j],content[j][j])
+                content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
+                # content[i]=content[i]%self.__field
 
     @staticmethod
     def switch_matrix_row(metrix,row,martixSize,stepLen=1):
@@ -334,13 +341,11 @@ class FiniteField:
     @staticmethod
     def gcd(m,n):
         if m>n:
-            tmp=m
-            m=n
-            n=tmp
+            m,n=n,m
         if n%m==0:
             return m
         else:
-            return FiniteField.gcd(n, n%m)
+            return FiniteField.gcd(m, n%m)
 
     @staticmethod
     def lcm(m, n):
