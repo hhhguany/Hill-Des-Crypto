@@ -281,50 +281,45 @@ class FiniteField:
 
             # 矩阵求逆变换
             '''
-            左下变换
+            Guass Jordan Elimination
             [[213,3213,23],
             [231,321,21],
             [23,42,21]]
 
-            [[213. 141.  23.   1.   0.   0.]
-            [  0. 158. 232. 179.  71.   0.]
+            [[ 24.   0.   0. 141. 219. 102.]
+            [  0. 170.   0.  60. 138. 162.]
             [  0.   0. 216.  41.  79. 118.]]
             '''
-            for i in range(len(content)):
-                if content[i][i]==0:
-                    content=self.switch_matrix_row(content,i,martixSize)
-                for j in range(i):
-                    lcm=self.lcm(content[i][j],content[j][j])
-                    content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
-                    content[i]=content[i]%self.__field
-            # self.__gauss_jordan_elimination_left_side(content)
-            '''
-            右上变换
-            '''
-            for i in range(martixSize-1,-1,-1):
-                if content[i][i]==0:
-                    content=self.switch_matrix_row(content,i,martixSize,-1)
-                for j in range(martixSize-1,i,-1):
-                    lcm=self.lcm(content[i][j],content[j][j])
-                    content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
-                    content[i]=content[i]%self.__field
+            self.__gauss_jordan_elimination_left_side(content)
+            self.__gauss_jordan_elimination_right_side(content)
+
 
 
             print(content)
         else:
             raise TypeError
-
+    def __gauss_jordan_eliminate(self,content):
+        clounmLen=content.shape[1]
     
     def __gauss_jordan_elimination_left_side(self,content):
-        martixSize=content.shape[0]
+        rowLen=content.shape[0]
         for i in range(len(content)):
             if content[i][i]==0:
-                content=self.switch_matrix_row(content,i,martixSize)
+                content=self.switch_matrix_row(content,i,rowLen)
             for j in range(i):
                 lcm=self.lcm(content[i][j],content[j][j])
                 content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
-                # content[i]=content[i]%self.__field
+                content[i]=content[i]%self.__field              # 缩短 GCD 时间，都是内不应该写这里
 
+    def __gauss_jordan_elimination_right_side(self,content):
+        rowLen=content.shape[0]
+        for i in range(rowLen-1,-1,-1):
+                if content[i][i]==0:
+                    content=self.switch_matrix_row(content,i,rowLen,-1)
+                for j in range(rowLen-1,i,-1):
+                    lcm=self.lcm(content[i][j],content[j][j])
+                    content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
+                    content[i]=content[i]%self.__field          # 缩短 GCD 时间，都是内不应该写这里
     @staticmethod
     def switch_matrix_row(metrix,row,martixSize,stepLen=1):
         i=row
