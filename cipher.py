@@ -292,14 +292,40 @@ class FiniteField:
             '''
             self.__gauss_jordan_elimination_left_side(content)
             self.__gauss_jordan_elimination_right_side(content)
-
-
-
+            self.__gauss_jordan_eliminate(content)
             print(content)
         else:
             raise TypeError
+
     def __gauss_jordan_eliminate(self,content):
-        clounmLen=content.shape[1]
+        rowLen=content.shape[0]
+        # clounmLen=Kcontent.shape[1]
+        for i in range(rowLen):
+            # For monitor
+            # vector=np.zeros((1,clounmLen+1))
+            time = FiniteField.get_prime(content[i][i],self.__field)
+            content[i]=time*content[i]%self.__field
+            content[i]=content[i]/content[i][i]
+
+
+    @staticmethod
+    def get_prime(number,field):
+        '''
+        用于求 number * result = 1 mod field
+        7*8=1 mod 11
+        '''
+        flag=False
+        for k in range(1,field):
+            for i in range(field):
+                m=(i*number)%field
+                if m==k: 
+                    flag=True
+                    break
+                else:
+                    print(str(m)+"!="+str(k))
+            if flag:
+                break
+        return i
     
     def __gauss_jordan_elimination_left_side(self,content):
         rowLen=content.shape[0]
