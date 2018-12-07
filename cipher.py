@@ -2,7 +2,8 @@ import util
 import numpy as np
 
 # __all__ = ["Hill", "Des"]
-
+PRIM_256=[1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191,
+193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255]
 
 class Hill:
     __key = [[]]
@@ -309,6 +310,7 @@ class FiniteField:
 
 
     @staticmethod
+    # TODO:改名为扩展欧几里得算法
     def get_prime(number,field):
         '''
         用于求 number * result = 1 mod field
@@ -317,16 +319,13 @@ class FiniteField:
         flag=False
         for k in range(1,field):
             for i in range(field):
-                m=(i*number)%field
-                if m==k: 
+                if (i*number)%field==k:
                     flag=True
                     break
-                else:
-                    print(str(m)+"!="+str(k))
             if flag:
                 break
         return i
-    
+
     def __gauss_jordan_elimination_left_side(self,content):
         rowLen=content.shape[0]
         for i in range(len(content)):
@@ -340,12 +339,12 @@ class FiniteField:
     def __gauss_jordan_elimination_right_side(self,content):
         rowLen=content.shape[0]
         for i in range(rowLen-1,-1,-1):
-                if content[i][i]==0:
-                    content=self.switch_matrix_row(content,i,rowLen,-1)
-                for j in range(rowLen-1,i,-1):
-                    lcm=self.lcm(content[i][j],content[j][j])
-                    content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
-                    content[i]=content[i]%self.__field          # 缩短 GCD 时间，都是内不应该写这里
+            if content[i][i]==0:
+                content=self.switch_matrix_row(content,i,rowLen,-1)
+            for j in range(rowLen-1,i,-1):
+                lcm=self.lcm(content[i][j],content[j][j])
+                content[i]=content[i]*(lcm/content[i][j])-content[j]*(lcm/content[j][j])
+                content[i]=content[i]%self.__field          # 缩短 GCD 时间，都是内不应该写这里
     @staticmethod
     def switch_matrix_row(metrix,row,martixSize,stepLen=1):
         i=row
@@ -373,6 +372,14 @@ class FiniteField:
         if m*n == 0:
             return 0
         return int(m*n/FiniteField.gcd(m, n))
+
+    @staticmethod
+    def get_prime_num_list(filed):
+        a=[]
+        for i in range(1,filed):
+            if FiniteField.gcd(i,filed)==1:
+                a.append(i)
+        return a
 
 if __name__ == "__main__":
     a=[[213,3213,23],[231,321,21],[23,42,21]]
