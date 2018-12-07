@@ -58,15 +58,16 @@ class Content:
 
     @staticmethod
     def string_to_line_content(string):
-        lineContent=[]
-        line=""
+        lineContent = []
+        line = ""
         for i in range(len(string)):
-            if string[i]=="\n":
+            if string[i] == "\n":
                 lineContent.append(line)
-                line=""
+                line = ""
             else:
-                line+=string[i]
+                line += string[i]
         return lineContent
+
 
 class ContentFile:
     __fileDist = ""
@@ -140,23 +141,20 @@ class ContentFile:
             ContentFile.write_block_to_file(fileDist, block, clear=False)
 
     @staticmethod
-    def read_file_key(fileDist,encode=""):
-        file = ContentFile.open_file(fileDist,"r")
-        content=file.read()
+    def read_file_key(fileDist, encode=""):
+        file = ContentFile.open_file(fileDist, "r")
+        content = file.read()
         file.close()
-        content=Content.string_to_line_content(content)
-        keyStringBlock=[]
-        keyLine=[]
+        content = Content.string_to_line_content(content)
+        keyStringBlock = []
+        keyLine = []
         for line in content:
-            if line!="":
-                line=line.split(" ")
+            if line != "":
+                line = line.split(" ")
                 for i in range(len(line)):
-                    if line[i]!="":
+                    if line[i] != "":
                         keyLine.append(int(line[i]))
                 keyStringBlock.append(keyLine)
-                keyLine=[]
+                keyLine = []
         # keyBlock=Content(keyStringBlock).content_to_block_array()
         return keyStringBlock
-        
-
-    
