@@ -33,10 +33,10 @@ class Hill:
         pass
 
     def reset_content(self):
-        self.__content = [[]]
+        self.__content = []
 
     def put_content(self, isPrint=False):
-        self.put_key(isPrint)
+        self.put_key(self.__key)
 
     def generate_hill_key_block(self, keyLen, keySapce=256, method=""):
         if np.sqrt(keyLen) != int(np.sqrt(keyLen)):
@@ -45,15 +45,25 @@ class Hill:
         rowLen = int(np.sqrt(keyLen))
         keyBlock = []
         keyLine = []
-        while 1:
-            for i in range(0, rowLen):
-                for j in range(0, rowLen):
-                    keyLine.append(np.random.randint(0, 255))
-                keyBlock.append(keyLine)
-                keyLine = []
-            if np.linalg.det(np.array(keyBlock)) != 0:
-                break
-            keyBlock = []  # 非可逆矩阵，清除
+
+        for i in range(0, rowLen):
+            for j in range(0, rowLen):
+                keyLine.append(PRIM_256[np.random.randint(0, 128)])
+            keyBlock.append(keyLine)
+            keyLine = []
+
+        # while 1:
+        #     for i in range(0, rowLen):
+        #         for j in range(0, rowLen):
+        #             keyLine.append(PRIM_256[np.random.randint(0, 128)])
+        #         keyBlock.append(keyLine)
+        #         keyLine = []
+        #     det=np.linalg.det(np.array(keyBlock))
+        #     if FiniteField.gcd(det%keySapce, keySapce) == 1:
+        #         break
+        #     # 非可逆矩阵，清除
+        #     keyBlock = [] 
+
         if method == "return":
             return keyBlock
         self.__key = keyBlock

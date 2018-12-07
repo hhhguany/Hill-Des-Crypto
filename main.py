@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 import sys, argparse, util, cipher
 import numpy as np
+import sys   
 
+sys.setrecursionlimit(10000) #递归为设置为1w层
 VSRSION = "Debug 1.22"
-
 ## usage:
 ## python cipher_new.py [function] [argument]
 
