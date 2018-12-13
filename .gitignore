@@ -338,8 +338,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-output.txt
-key.txt
-outputtestaft.txt
-outputtestbef.txt
-sss.txt
+*.txt
+*.stackdump

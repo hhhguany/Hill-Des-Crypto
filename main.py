@@ -12,17 +12,17 @@ VSRSION = "Debug 1.22"
 
 def main():
     options = get_args()
-    function_encrypt("HILL", inDist=options.inFile, outDist=options.outFile)
+    function_encrypt("HILL", inDist=options.inFile, outDist=options.outFile, key=cipher.HILL_KEY)
     key = util.ContentFile.read_file_key("key.txt")
-    function_decryption("HILL", key, inDist=options.inFile, outDist="sss.txt")
-    print(key)
+    function_decryption("HILL", cipher.HILL_KEY_REVERSE, inDist="cipher_txt.txt", outDist="pain_txt.txt")
+    # print(key)
     input()
 
 
 def get_args():
     parser = argparse.ArgumentParser(description="一个加解密小程序")
     parser.add_argument("-i", "--infile", dest="inFile", default="message.txt", help="明文路径，默认为当前目录下 message.txt 文件")
-    parser.add_argument("-o", "--outfile", dest="outFile", default="output.txt", help="输出明文路径，默认输出到当前目录下 output.txt 文件")
+    parser.add_argument("-o", "--outfile", dest="outFile", default="cipher_txt.txt", help="输出明文路径，默认输出到当前目录下 output.txt 文件")
     parser.add_argument("-d", "--decode", dest="decode", default="ASCII", help="解码方式：[ASCII|UTF8]")
     parser.add_argument("-e", "--encode", dest="encode", default="ASCII", help="编码方式：[ASCII|UTF8]")
     parser.add_argument("-a", "--algorithm", dest="algorithm", default="HILL", help="加密算法：[HILL|DES]")
@@ -58,7 +58,7 @@ def function_encrypt(algorithm, **arg):
         contentBlockArray = content.content_to_block_array()
 
         # test
-        util.ContentFile.write_block_array_to_file("outputtestbef.txt", contentBlockArray)
+        util.ContentFile.write_block_array_to_file("message_ascii.txt", contentBlockArray)
 
         hill = cipher.Hill(contentBlockArray)
         if "key" not in arg:
@@ -66,9 +66,12 @@ def function_encrypt(algorithm, **arg):
             util.ContentFile.write_block_to_file("key.txt", hillKey)
             hill.set_key(hillKey)
         else:
-            hill.generate_hill_key_block(64)
+            util.ContentFile.write_block_to_file("key.txt", arg["key"])
+            hill.set_key(arg["key"])
 
         cipherBlockArray = hill.encrypt(256)
+        
+        util.ContentFile.write_block_array_to_file("cipher_1_out.txt",cipherBlockArray)
 
         cipherContent = util.BlockArray(cipherBlockArray)
         content = util.Content(cipherContent.block_array_to_content())
@@ -86,15 +89,15 @@ def function_decryption(algorithm, key, **arg):
         contentBlockArray = content.content_to_block_array()
 
         # test
-        util.ContentFile.write_block_array_to_file("outputtestaft.txt", contentBlockArray)
+        util.ContentFile.write_block_array_to_file("ciphet_text_ascii.txt", contentBlockArray)
 
-        # hill = cipher.Hill(contentBlockArray, key)
-        # plainBlockArray = hill.decrypt(256)
-        # plainContent = util.BlockArray(plainBlockArray)
-        # content = util.Content(plainContent.block_array_to_content())
-        # content.content_drop_padding()
-        # outFile = util.ContentFile(arg["outDist"])
-        # outFile.write_ord(content.content)
+        hill = cipher.Hill(contentBlockArray, key)
+        plainBlockArray = hill.decrypt(256)
+        plainContent = util.BlockArray(plainBlockArray)
+        content = util.Content(plainContent.block_array_to_content())
+        content.content_drop_padding()
+        outFile = util.ContentFile(arg["outDist"])
+        outFile.write_ord(content.content)
 
 
 def function_get_hill_key():

@@ -82,7 +82,7 @@ class ContentFile:
         if contentEncode == "ASCII":
             encodeContent = []
             for letter in content:
-                encodeContent.append(ord(letter))
+                encodeContent.append(ord(letter)%256)
         return encodeContent
 
     def clear(self):
