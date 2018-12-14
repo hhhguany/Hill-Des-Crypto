@@ -7,6 +7,8 @@ HILL_KEY = [[21, 109, 119, 23, 88, 15, 116, 66], [22, 119, 70, 118, 111, 82, 121
 HILL_KEY_REVERSE = [[138, 124, 28, 104, 136, 176, 193, 182], [65, 229, 101, 214, 103, 57, 4, 224], [140, 138, 214, 71, 46, 62, 148, 184], [77, 64, 202, 44, 119, 246, 60, 86],
                     [69, 173, 41, 8, 106, 175, 255, 119], [105, 45, 131, 23, 116, 193, 29, 114], [190, 79, 82, 26, 81, 22, 187, 253], [70, 99, 51, 2, 221, 248, 152, 59]]
 
+DES_KEY = [49,18,77,23,23,23,45,67]
+
 IP = [[58, 50, 42, 34, 26, 18, 10, 2],
     [60, 52, 44, 36, 28, 20, 12, 4],
     [62, 54, 46, 38, 30, 22, 14, 6],
@@ -65,11 +67,23 @@ S_BOX = [
 
 def get_content():
     content=input("Enter the word to encrypt:")
+    return content
+
+def string_to_ascii_list(content):
     out=[]
     for letter in content:
         out.append(ord(letter))
     return out
-    
+
+def ascii_list_to_bin_list(asciiList,binLen=8):
+    out=[]
+    for ascii in asciiList:
+        itemBin=bin(ascii)
+        for i in range(binLen+2-len(itemBin)):
+            out.append(0)
+        for b in itemBin[2:]:
+            out.append(int(b))
+    return out
 
 def ascii_list_to_string(list):
     str=""
@@ -77,8 +91,8 @@ def ascii_list_to_string(list):
         str+=chr(item)
     return str
 
-def padding_content(content):
-    for i in range(int(len(content) / 64 + 1) * 64 - len(content)):
+def padding_content(content,blocksize=64):
+    for i in range(int(len(content) / blocksize + 1) * blocksize - len(content)):
         content.append(0)
     return content
 
@@ -106,6 +120,13 @@ def block_array_to_content(contentBlockArray, block_height=8, block_length=8):
         for contentLine in contentBlock:
             for contentItem in contentLine:
                 content.append(contentItem)
+    return content
+
+def block_to_content(contentBlock, block_height=8, block_length=8):
+    content = []
+    for contentLine in contentBlock:
+        for contentItem in contentLine:
+            content.append(contentItem)
     return content
 
 def hill_encrypt_block_array(contentBlockArray, keyBlock, field):
@@ -138,38 +159,43 @@ def hill_decrypt_block(contentBlock, keyBlock, field):
     plainBlock = np.ndarray.tolist(np.dot(contentArray, keyArray) % field)
     return plainBlock
 
-def des_encypt_block_array(contentBlockArray,keyBlock):
+def des_content_proc(content):
+    return content_to_block_array(padding_content(ascii_list_to_bin_list(string_to_ascii_list(content))))
+
+def des_encypt_block_array(content,keyBlock):
     cipherBlockArray = []
     keyBlockNum = 0
-    for contentBlock in contentBlockArray:
-        outMetrix = hill_encrypt_block(contentBlock, keyBlock, field)
+    for contentBlock in content:
+        outMetrix = des_encypt_block(contentBlock, keyBlock)
         cipherBlockArray.append(outMetrix)
     return cipherBlockArray
 
 def des_encypt_block(contentBlock,keyBlock):
     step1=des_do_ip(contentBlock)
+    print("IP 置换：")
+    print(step1)
     return step1
 
 def des_do_ip(contentBlock):
-    content=block_array_to_content(contentBlock)
-    ipList=block_array_to_content(IP)
+    content=block_to_content(contentBlock)
+    ipList=block_to_content(IP)
     out=content
     for i in range(len(content)):
-        out[i]=content[ipList[i]]
+        out[i]=content[ipList[i]-1]
     return out
 
 
 if __name__ == "__main__":
-    text = content_to_block_array(padding_content(get_content()))
-    # text="dasfshjfahjfhlaskfhjlhahjdkasfhlasdkfjlshk"
-    # text = content_to_block_array(padding_content(string_to_list(text)))
+    # text = content_to_block_array(padding_content(get_content()))
+    message="dasfshjfahjfhlaskfhjlhahjdkasfhlasdkfjlshkhfdsjafhljlkshafjsdfhasjlfhasjlkfhaskljdhfsdjkafhjksdfhjksfhjksjfhkasfhjksdfhjkahsjfhewuwiahufeiwfhewuifhuwiafhiwajskdhjlfhasdjkfhjasdkfhsjklhfjskfhsdjkfhklhsjkjfhlsdjkfhsdjkfhsdjkfhkjdahklhfbvwuebvwabvluwivbew;bvu;ewibvevuewivbweivbuwebui"
+    text = content_to_block_array(padding_content(string_to_ascii_list(message)))
     print("明文：\n")
     print(text)
 
     # 希尔加密
     cipher=hill_encrypt_block_array(text,HILL_KEY,256)
     cipher=drop_padding(block_array_to_content(cipher))
-    print("密文：")
+    print("HILL 密文：")
     # print(cipher)
     print(ascii_list_to_string(cipher))
 
@@ -177,7 +203,10 @@ if __name__ == "__main__":
     cipher=content_to_block_array(padding_content(cipher))
     plain=hill_decrypt_block_array(cipher,HILL_KEY_REVERSE,256)
     plain=drop_padding(block_array_to_content(plain))
-    print("解密文:")
+    print("HILL 解密文:")
     # print(plain)
     print(ascii_list_to_string(plain))
 
+    # DES 加密
+    cipher=des_encypt_block_array(text,"Dsa")
+    # DES 解密
