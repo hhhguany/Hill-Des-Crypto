@@ -340,3 +340,5 @@ ASALocalRun/
 .mfractor/
 *.txt
 *.stackdump
+*.pdf
+

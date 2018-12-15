@@ -381,9 +381,9 @@ def des_do_ip_inverse(contentBlock):
 
 def hill():
     # text = content_to_block_array(padding_content(get_content()))
-    message = "dasfshjfahjfhlaskfhjlhahjdkasfhlasdkfjlshkhfdsjafhljlkshafjsdfhasjlfhasjlkfhaskljdhfsdjkafhjksdfhjksfhjksjfhkasfhjksdfhjkahsjfhewuwiahufeiwfhewuifhuwiafhiwajskdhjlfhasdjkfhjasdkfhsjklhfjskfhsdjkfhklhsjkjfhlsdjkfhsdjkfhsdjkfhkjdahklhfbvwuebvwabvluwivbew;bvu;ewibvevuewivbweivbuwebui"
+    message = "Typora will give you a seamless experience as both a reader and a writer. It removes the preview window, mode switcher, syntax symbols of markdown source code, and all other unnecessary distractions.."
     text = content_to_block_array(padding_content(string_to_ascii_list(message)))
-    print("明文：\n")
+    print("明文数组")
     print(text)
 
     # 希尔加密
@@ -402,7 +402,7 @@ def hill():
     print(ascii_list_to_string(plain))
 
 def des():
-    message = "fdsafafjwufqwefuilnqwunfliqweunufnweq;infweidfajsfydgyuqgkuildhqluqwih;diqwoidhuqwoudhqwiudqwibuibxuwqnixlunxuqoixnw;qonxinwioqnxiwq;nxiowqioxn;qwnx;wiqnixom;qwxim;qwoxmoqw,pxoqwm;p,xoqwmxp;o,qxowqp,;oxqopxolq,;xm,qe/cdqemclmeqlcmqkcklqnecklnkqeclknql;ckn;qenck;qnu"
+    message = "aaaaaaaa"
     # message=[15,14,15,14,15,14,15,14,15,14,15,14,15,14,15,14]
     # key=[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]z
 
@@ -417,8 +417,8 @@ def des():
     # DES 加密
     cipher = des_encypt_block_array(message, DES_KEY)
     cipher = des_block_array_to_content(cipher)
-    print("DES 密文数组：")
-    print(cipher)
+    # print("DES 密文数组：")
+    # print(cipher)
     print("DES 密文 ASCII：")
     print(bin_to_string(cipher))
 
@@ -432,8 +432,8 @@ def des():
     cipher = content_to_des_block_array(cipher)
     plain = des_decrypt_block_array(cipher, DES_KEY)
     palin = des_block_array_to_content(plain)
-    print("DES 明文数组：")
-    print(palin)
+    # print("DES 明文数组：")
+    # print(palin)
     print("DES 明文 ASCII：")
     print(bin_to_string(palin))
 
