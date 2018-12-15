@@ -70,8 +70,8 @@ def function_encrypt(algorithm, **arg):
             hill.set_key(arg["key"])
 
         cipherBlockArray = hill.encrypt(256)
-        
-        util.ContentFile.write_block_array_to_file("cipher_1_out.txt",cipherBlockArray)
+
+        util.ContentFile.write_block_array_to_file("cipher_1_out.txt", cipherBlockArray)
 
         cipherContent = util.BlockArray(cipherBlockArray)
         content = util.Content(cipherContent.block_array_to_content())
