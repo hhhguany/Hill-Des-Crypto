@@ -205,7 +205,7 @@ def list_xor(list1, list2):
 
 def get_sub_key(keyBlock, keyBlockFormatBase=8):
     key = ascii_list_to_bin_list(keyBlock, keyBlockFormatBase)
-    
+
     file = open("debug.txt", "a")
     file.write("\n密钥：\n")
     file.writelines(str(key))
@@ -238,7 +238,7 @@ def des_key_do_shift_pc_2(keyList):
     PC = [14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4, 26, 8, 16, 7, 27, 20, 13, 2, 41, 52, 31, 37, 47, 55, 30, 40, 51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32]
     MOV = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
     result = []
-    key56=keyList
+    key56 = keyList
     for i in range(16):
         # 每28位为一部分，分别进行循环左移
         key0 = des_do_shift(key56[:28], MOV[i])
@@ -339,10 +339,10 @@ def des_encypt_block(contentBlock, subKeyArray, keyBlockFormatBase=8):
 
     # subKeyArray=get_sub_key(keyBlock,keyBlockFormatBase)
     for i in range(16):
-        l,r=text[:32], text[32:]
-        lNext=r
-        rNext=des_do_right32(l, r, subKeyArray[i])
-        text=lNext+rNext
+        l, r = text[:32], text[32:]
+        lNext = r
+        rNext = des_do_right32(l, r, subKeyArray[i])
+        text = lNext + rNext
 
         file = open("debug.txt", "a")
         file.write("\n第" + str(i + 1) + "轮输出：\n")
@@ -400,6 +400,7 @@ def hill():
     print("HILL 解密文:")
     # print(plain)
     print(ascii_list_to_string(plain))
+
 
 def des():
     message = "aaaaaaaa"
