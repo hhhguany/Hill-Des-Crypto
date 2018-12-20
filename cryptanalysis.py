@@ -47,7 +47,6 @@ DES_S_BOX = [[
                  [2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11],
              ]]
 
-<<<<<<< HEAD
 AES_S_BOX = [
     [0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76],
     [0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0],
@@ -67,8 +66,6 @@ AES_S_BOX = [
     [0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16],
 ]
 
-=======
->>>>>>> a1e1244aba46271bac9394b96ba7817043d99075
 
 def differential_cryptanalysis():
     padding, out, _in, count = [], [], [], 0
@@ -78,10 +75,7 @@ def differential_cryptanalysis():
             _in.append(int_to_bin(i, 6))
             out.append(des_do_s_box(_in[-1], round))
         for j in range(64):
-<<<<<<< HEAD
             # Analysis X2⊕Y1⊕Y2⊕Y3⊕Y4
-=======
->>>>>>> a1e1244aba46271bac9394b96ba7817043d99075
             if int(out[j][0]) ^ int(out[j][1]) ^ int(out[j][2]) ^ int(out[j][3]) ^ int(_in[j][1]) == 0:
                 count += 1
         padding.append(count - 32)
@@ -96,7 +90,6 @@ def des_do_s_box(_in, round):
     return out
 
 
-<<<<<<< HEAD
 def aes_do_s_box(_in):
     row = int(str(_in[:4]), 2)
     column = int(str(_in[4:]), 2)
@@ -107,8 +100,6 @@ def aes_do_s_box(_in):
     return out
 
 
-=======
->>>>>>> a1e1244aba46271bac9394b96ba7817043d99075
 def int_to_bin(_int, _len=4):
     out = bin(_int)[2:]
     while len(out) < _len:
@@ -117,10 +108,6 @@ def int_to_bin(_int, _len=4):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     #differential_cryptanalysis()
     a = "00000000"
     print(aes_do_s_box(a))
-=======
-    differential_cryptanalysis()
->>>>>>> a1e1244aba46271bac9394b96ba7817043d99075
