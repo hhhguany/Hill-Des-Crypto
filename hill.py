@@ -42,7 +42,7 @@ class PlainText:
         text = self.__text.lower()
         for l in text:
             if l.isalpha():
-                out.append(ord(l) - 65 + base)
+                out.append(ord(l) - 97 + base)
             else:
                 out.append(-1)
         return out
@@ -66,62 +66,106 @@ class PlainText:
 
     @staticmethod
     def combine_list(_list, level):
-        out=[]
+        out = []
         for low in _list:
-            out+=low
-        if level!=2:
-            PlainText.combine_list(out,level-1)
+            out += low
+        if level != 2:
+            PlainText.combine_list(out, level - 1)
         else:
             return out
 
     @staticmethod
-    def number_to_words(_list,base=0):
-        out=''
+    def number_to_words(_list, base=0):
+        out = ''
         for index in _list:
-            out+=chr(index+65-base)
+            out += chr(index + 97 - base)
         return out
+
 
 class Hill:
-    __plainText=[]
-    __key=[]
+    __plainText = []
+    __key = []
 
-    def __init__(self,plainText,key):
-        if not(Hill.check_ok):
+    def __init__(self, plainText, key):
+        if not (Hill.check_ok):
             raise TypeError
-        self.__plainText=plainText
-        self.__key=key
+        self.__plainText = plainText
+        self.__key = key
 
     @staticmethod
-    def check_ok(plainText,key):
-        keyCol=len(key[0])
-        textRow=len(plainText[0])
-        return (True if keyCol==textRow else False)
-            
-    def enCipher(self):
-        key=numpy.array(self.__key)
-        out=[]
+    def check_ok(plainText, key):
+        keyCol = len(key[0])
+        textRow = len(plainText[0])
+        return (True if keyCol == textRow else False)
+
+    def encipher(self):
+        key = numpy.array(self.__key)
+        out = []
         for textGroup in self.__plainText:
-            text=numpy.transpose(numpy.array(textGroup))
-            out.append(numpy.ndarray.tolist(numpy.transpose(numpy.multiply(key,text)%26)))
+            text = numpy.array(textGroup).reshape(-1, 1)
+            out += numpy.ndarray.tolist(numpy.transpose(numpy.matmul(key, text) % 26))
+        return out
+
+    def decipher(self):
+        keyInv = CipherMath.key_inverse(self.__key, 26)
+        out = []
+        for textGroup in self.__plainText:
+            text = numpy.array(textGroup).reshape(-1, 1)
+            out += numpy.ndarray.tolist(numpy.transpose(numpy.matmul(keyInv, text) % 26))
         return out
 
 
+class CipherMath:
+    @staticmethod
+    def key_inverse(keyList, limit):
+        '''
+        伴随矩阵法求矩阵逆运算
+        '''
+        keyArray=numpy.array(keyList)
+        keyArrayDet=numpy.linalg.det(keyArray)
+        keyArrayInv=numpy.linalg.inv(keyArray)
+        keyArrayAdj=numpy.int32(keyArrayInv*keyArrayDet)
+        keyArrayInv=keyArrayAdj*CipherMath.get_prime(int(keyArrayDet),26)
+        keyArrayInv=keyArrayInv%26
+        return keyArrayInv
+
+    @staticmethod
+    def get_prime(number, field):
+        '''
+        用于求 number * result = 1 mod field
+        7*8=1 mod 11
+        '''
+        flag = False
+        for k in range(1, field):
+            for i in range(field):
+                if (i * number) % field == k:
+                    flag = True
+                    break
+            if flag:
+                break
+        return i
+
+
+MESSAGE = "ukixukydromeiwszxwiokunukhxhroajroanqyebxfzxgc"
+SECRET = "meetmeattheusualplaceattenratherthaneightclock"
+KEY = [[9, 4], [5, 7]]
+KEY_INV = [[5, 12], [15, 25]]
 
 if __name__ == "__main__":
-    pt = PlainText("meetmeattheusualplaceattenratherthaneightclock")
+    print("------加密------")
+    print("明文：" + MESSAGE)
+    pt = PlainText(MESSAGE)
     number = pt.words_to_number()
-    print(number)
-    splitList=PlainText.split_list(number, 2)
-    print(splitList)
-    keyList=[[9,4],[5,7]]
+    splitList = PlainText.split_list(number, 2)
 
-    hill = Hill(splitList,keyList)
-    secret=hill.enCipher()
+    hill = Hill(splitList, KEY)
+    secret = hill.encipher()
+    secret = PlainText.combine_list(secret, 2)
+    secret = PlainText.number_to_words(secret)
+    print("密文：" + secret)
 
-    print(secret)
-
-    combineList=PlainText.combine_list(splitList,2)
-    print(combineList)
-    words=PlainText.number_to_words(combineList)
-    print(words)
-
+    print("------密文------")
+    message=hill.decipher()
+    message=PlainText.combine_list(message,2)
+    message=PlainText.number_to_words(message)
+    print("明文：" + message)
