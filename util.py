@@ -1,5 +1,69 @@
 import numpy as np
 
+class StringOpt:
+    @staticmethod
+    def text_padding(text, baseLen, paddingItem=" "):
+        isinstance(paddingItem, str)
+        while len(text) % baseLen != 0:
+            text += paddingItem
+
+    @staticmethod
+    def text_inv_padding(text,paddingItem=" "):
+        for i in range(len(text), 0, -1):
+            if text[i - 1] != paddingItem:
+                text = text[:i]
+                break
+
+    @staticmethod
+    def words_to_number(text, base=0):
+        '''
+        转换为字母序号，A/a=>0，B/b=>1
+        base 为基数，默认 base 为 0 ，当 base 为 1 时，A/a=>1，B/b=>2
+        '''
+        out = []
+        text = text.lower()
+        for l in text:
+            if l.isalpha():
+                out.append(ord(l) - 97 + base)
+            else:
+                out.append(-1)
+        return out
+
+    @staticmethod
+    def ascii_to_list(text):
+        out = []
+        for l in text:
+            out.append(ord(l))
+        return out
+
+    @staticmethod
+    def split_list(_list, length):
+        isinstance(_list, list)
+        if len(_list) % length != 0:
+            raise TypeError
+        out = []
+        for i in range(int(len(_list) / length)):
+            out.append(_list[:length])
+            _list = _list[length:]
+        return out
+
+    @staticmethod
+    def combine_list(_list, level):
+        out = []
+        for low in _list:
+            out += low
+        if level != 2:
+            StringOpt.combine_list(out, level - 1)
+        else:
+            return out
+
+    @staticmethod
+    def number_to_words(_list, base=0):
+        out = ''
+        for index in _list:
+            out += chr(index + 97 - base)
+        return out
+    
 
 class BlockArray:
     contentBlockArray = [[]]
