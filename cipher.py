@@ -328,7 +328,8 @@ class FiniteField:
             time = FiniteField.get_prime(content[i][i], self.__field)
             content[i] = time * content[i] % self.__field
             content[i] = content[i] / content[i][i]
-
+            
+    @staticmethod
     def field_matrix_multiplication(matrix1,matrix2,field):
         return np.ndarray.tolist(np.dot(np.array(matrix1),np.array(matrix2))%field)
 
