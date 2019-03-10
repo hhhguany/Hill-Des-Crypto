@@ -325,7 +325,7 @@ class FiniteField:
         for i in range(rowLen):
             # For monitor
             # vector=np.zeros((1,clounmLen+1))
-            time = FiniteField.get_prime(content[i][i], self.__field)
+            time = FiniteField.extend_euclid(content[i][i], self.__field)
             content[i] = time * content[i] % self.__field
             content[i] = content[i] / content[i][i]
             
@@ -333,22 +333,56 @@ class FiniteField:
     def field_matrix_multiplication(matrix1,matrix2,field):
         return np.ndarray.tolist(np.dot(np.array(matrix1),np.array(matrix2))%field)
 
+    # @staticmethod
+    #
+    # def get_prime(number, field):
+    #     '''
+    #     用于求 number * result = 1 mod field
+    #     7*8=1 mod 11
+    #     '''
+    #     flag = False
+    #     for k in range(1, field):
+    #         for i in range(field):
+    #             if (i * number) % field == k:
+    #                 flag = True
+    #                 break
+    #         if flag:
+    #             break
+    #     return i
+
     @staticmethod
-    # TODO:改名为扩展欧几里得算法
-    def get_prime(number, field):
-        '''
-        用于求 number * result = 1 mod field
-        7*8=1 mod 11
-        '''
-        flag = False
-        for k in range(1, field):
-            for i in range(field):
-                if (i * number) % field == k:
-                    flag = True
-                    break
-            if flag:
-                break
-        return i
+    def extend_euclid(num1 , num2):
+        flag=0
+        if num1<num2:
+            num1,num2=num2,num1
+            flag=1
+        a,b=[0,0],[0,0]
+
+        if num2!=FiniteField.gcd(num1,num2):
+            quotient=int(num1/num2)
+            num1,num2=num2,num1%num2
+            a=[1,-quotient]
+            
+            if num2!=FiniteField.gcd(num1,num2):
+                quotient=int(num1/num2)
+                b=[-quotient,1-a[1]*quotient]
+                num1,num2=num2,num1%num2
+            else:
+                b=[1,-quotient]
+        else:
+            b=[1,-quotient]
+
+        while num2!=FiniteField.gcd(num1,num2):
+            remainder=num1%num2
+            quotient=int(num1/num2)
+            num1,num2=num2,remainder
+            tmp = a
+            a=b
+            b[0]=tmp[0]-a[0]*quotient
+            b[1]=tmp[1]-a[1]*quotient
+        
+        return b if flag==0 else [b[1],b[0]]
+
 
     def __gauss_jordan_elimination_left_side(self, content):
         rowLen = content.shape[0]
@@ -422,4 +456,5 @@ class FiniteField:
 
 if __name__ == "__main__":
     a= FiniteField.field_matrix_multiplication(HILL_KEY_REVERSE,HILL_KEY,256)
+    print(FiniteField.extend_euclid(66,67))
     print(a)
