@@ -20,8 +20,8 @@ class Hill:
     __content = [[]]
 
     def __init__(self, content=[[]], key=[[]]):
-        self.__content = content  ## BlockArray
-        self.__key = key  ## BlockArray
+        self.__content = content  # BlockArray
+        self.__key = key  # BlockArray
 
     def set_key(self, key):
         self.__key = key
@@ -314,7 +314,8 @@ class FiniteField:
             self.__gauss_jordan_elimination_left_side(content)
             self.__gauss_jordan_elimination_right_side(content)
             self.__gauss_jordan_eliminate(content)
-            out = [np.ndarray.tolist(content[i][martixSize:]) for i in range(content.shape[0])]
+            out = [np.ndarray.tolist(content[i][martixSize:])
+                   for i in range(content.shape[0])]
             print(out)
         else:
             raise TypeError
@@ -329,8 +330,9 @@ class FiniteField:
             content[i] = time * content[i] % self.__field
             content[i] = content[i] / content[i][i]
 
-    def field_matrix_multiplication(matrix1,matrix2,field):
-        return np.ndarray.tolist(np.dot(np.array(matrix1),np.array(matrix2))%field)
+    @staticmethod
+    def field_matrix_multiplication(matrix1, matrix2, field):
+        return np.ndarray.tolist(np.dot(np.array(matrix1), np.array(matrix2)) % field)
 
     @staticmethod
     # TODO:改名为扩展欧几里得算法
@@ -356,7 +358,8 @@ class FiniteField:
                 content = self.switch_matrix_row(content, i, rowLen)
             for j in range(i):
                 lcm = self.lcm(content[i][j], content[j][j])
-                content[i] = content[i] * (lcm / content[i][j]) - content[j] * (lcm / content[j][j])
+                content[i] = content[i] * \
+                    (lcm / content[i][j]) - content[j] * (lcm / content[j][j])
                 content[i] = content[i] % self.__field  # 缩短 GCD 时间，都是内不应该写这里
 
     def __gauss_jordan_elimination_right_side(self, content):
@@ -366,7 +369,8 @@ class FiniteField:
                 content = self.switch_matrix_row(content, i, rowLen, -1)
             for j in range(rowLen - 1, i, -1):
                 lcm = self.lcm(content[i][j], content[j][j])
-                content[i] = content[i] * (lcm / content[i][j]) - content[j] * (lcm / content[j][j])
+                content[i] = content[i] * \
+                    (lcm / content[i][j]) - content[j] * (lcm / content[j][j])
                 content[i] = content[i] % self.__field  # 缩短 GCD 时间，都是内不应该写这里
 
     @staticmethod
@@ -382,14 +386,20 @@ class FiniteField:
         metrix[row] = tmp  # 理论上不应该存在最后一行盒第一行调换
         return metrix
 
+    # @staticmethod
+    # def gcd(m, n):
+    #     if m > n:
+    #         m, n = n, m
+    #     if n % m == 0:
+    #         return m
+    #     else:
+    #         return FiniteField.gcd(m, n % m)
     @staticmethod
     def gcd(m, n):
-        if m > n:
-            m, n = n, m
-        if n % m == 0:
-            return m
+        if(m == 0 or n == 0):
+            return (m+n)
         else:
-            return FiniteField.gcd(m, n % m)
+            return(FiniteField.gcd(m % n, n % m))
 
     @staticmethod
     def lcm(m, n):
@@ -414,11 +424,14 @@ class FiniteField:
         else:
             s = 0
             for i in range(len(m)):
-                n = [[row[a] for a in range(len(m)) if a != i] for row in m[1:]]  # 这里生成余子式
-                s += m[0][i] * FiniteField.det(n,field) * (-1) ** (i % 2) % field
+                n = [[row[a] for a in range(len(m)) if a != i]
+                     for row in m[1:]]  # 这里生成余子式
+                s += m[0][i] * \
+                    FiniteField.det(n, field) * (-1) ** (i % 2) % field
             return s
 
 
 if __name__ == "__main__":
-    a= FiniteField.field_matrix_multiplication(HILL_KEY_REVERSE,HILL_KEY,256)
+    a = FiniteField.field_matrix_multiplication(
+        HILL_KEY_REVERSE, HILL_KEY, 256)
     print(a)
